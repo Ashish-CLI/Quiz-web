@@ -112,7 +112,91 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.hero_img {
+  overflow: hidden;
+   height: 100%; 
+  /* background-color: #0d0514; */
+  background-image: url("https://assets.website-files.com/61678d6b37c12ee4c5ce8ac4/61678eed58b7da38020abf57_hero-image.jpg");
+  background-position: 50% 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: #eae9ee;
+}
+
+.hero_wrap {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  padding: 2.5em;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(13, 5, 20, 0)), color-stop(71%, rgba(13, 5, 20, 0)), color-stop(90%, #0d0514));
+  background-image: linear-gradient(180deg, rgba(13, 5, 20, 0), rgba(13, 5, 20, 0) 71%, #0d0514 90%);
+}
+
+.hero_bottom {
+  width: 100%;
+  -webkit-transition: opacity 300ms ease;
+  transition: opacity 300ms ease;
+}
+
+.progress {
+  width: 80%;
+  height: 0.9em;
+  margin-top:5em;
+  border-style: solid;
+  border-width: 1px;
+  border-color: rgba(234, 233, 238, 0.3);
+  border-radius: 100vw;
+}
+
+.question_wrap {
+  padding-right: 7.81em;
+  padding-left: 7.81em;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  overflow-y: hidden;
+  width: 80%;
+  padding-top: 9.01em;
+  padding-bottom: 9.01em;
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 auto;
+  -ms-flex: 0 auto;
+  flex: 0 auto;
+}
+
+.progress_bar {
+  width: 0%;
+  height: 100%;
+  border-radius: 100vw;
+  background-image: -webkit-gradient(linear, left top, right top, from(#5bbeeb), to(#fd92fe));
+  background-image: linear-gradient(90deg, #5bbeeb, #fd92fe);
+  -webkit-transition: width 500ms cubic-bezier(.165, .84, .44, 1);
+  transition: width 500ms cubic-bezier(.165, .84, .44, 1);
+}
+
 @layer base {
+  html {
+    @apply h-full bg-background text-foreground;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -120,3 +204,5 @@
     @apply bg-background text-foreground;
   }
 }
+
+

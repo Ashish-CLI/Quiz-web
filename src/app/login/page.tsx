@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LoginBg from "@/components/login-bg1";
@@ -10,13 +10,36 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = (e : any) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Logging in with:", email);
-    router.push("/dashboard");
+    setError(null);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Login failed");
+        return;
+      }
+
+
+      // Redirect to protected area
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Login request error:", err);
+      setError("An unexpected error occurred");
+    }
   };
 
   return (
@@ -139,6 +162,10 @@ export default function Login() {
           </div>
         </form>
 
+        {error && (
+          <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+        )}
+
         {/* Admin Login */}
         <div className="mt-6">
           <div className="relative">
@@ -149,16 +176,7 @@ export default function Login() {
               <span className="px-2  text-gray-200">or</span>
             </div>
           </div>
-
-          <div className="mt-6">
-            <button
-              type="button"
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Login to Admin Account
-            </button>
           </div>
-        </div>
 
         {/* Forgot Password */}
         <div className="text-center mt-6">
@@ -180,5 +198,6 @@ export default function Login() {
         </div>
       </div>
     </div>
+    
   );
 }

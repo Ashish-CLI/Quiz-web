@@ -10,6 +10,7 @@ import {
   Vector2,
   Vector3,
   MeshPhysicalMaterial,
+  MeshBasicMaterial, // Added MeshBasicMaterial
   ShaderChunk,
   Color,
   Object3D,
@@ -20,7 +21,7 @@ import {
   PointLight,
   ACESFilmicToneMapping,
   Raycaster,
-  Plane
+  Plane 
 } from 'three'
 // @ts-ignore
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -689,9 +690,14 @@ class Z extends InstancedMesh {
     const pmrem = new PMREMGenerator(renderer);
     const envTexture = pmrem.fromScene(roomEnv).texture;
     const geometry = new SphereGeometry();
-    const material = new Y({ envMap: envTexture, ...config.materialParams });
+    const material = new MeshBasicMaterial({ color: 0xff0000 }); // Temporarily use a basic red material
+    // const material = new Y({ envMap: envTexture, ...config.materialParams });
     (material as any).envMapRotation = { x: -Math.PI / 2, y: 0, z: 0 };
     super(geometry, material, config.count);
+    console.log("Z constructor: Material used:", material);
+    console.log("Z constructor: Material color:", material.color);
+    console.log("Z constructor: Material transparent:", material.transparent);
+    console.log("Z constructor: Material opacity:", material.opacity);
     this.config = config;
     this.physics = new W(config);
     this.#setupLights();
@@ -737,20 +743,20 @@ class Z extends InstancedMesh {
         };
       })(colors);
       for (let idx = 0; idx < this.physics.config.count; idx++) {
-        (this as any).setColorAt(idx, colorUtils.getColorAt(idx / this.count));
+        (this as any).setColorAt(idx, colorUtils.getColorAt(idx / this.physics.config.count));
         if (idx === 0) {
-          this.light!.color.copy(colorUtils.getColorAt(idx / this.count));
+          this.light!.color.copy(colorUtils.getColorAt(idx / this.physics.config.count));
         }
       }
 
-      if (!this.instanceColor) return;
-      this.instanceColor.needsUpdate = true;
+      if (!(this as any).instanceColor) return;
+      (this as any).instanceColor.needsUpdate = true;
     }
   }
 
   update(deltaInfo: { delta: number }) {
     this.physics.update(deltaInfo);
-    for (let idx = 0; idx < this.count; idx++) {
+    for (let idx = 0; idx < this.physics.config.count; idx++) {
       U.position.fromArray(this.physics.positionData, 3 * idx);
       if (idx === 0 && this.config.followCursor === false) {
         U.scale.setScalar(0);
@@ -758,10 +764,12 @@ class Z extends InstancedMesh {
         U.scale.setScalar(this.physics.sizeData[idx]);
       }
       U.updateMatrix();
-      this.setMatrixAt(idx, U.matrix);
+      (this as any).setMatrixAt(idx, U.matrix);
       if (idx === 0) this.light!.position.copy(U.position);
     }
-    this.instanceMatrix.needsUpdate = true;
+    (this as any).instanceMatrix.needsUpdate = true;
+    // console.log("Z update: First sphere position:", U.position);
+    // console.log("Z update: First sphere scale:", U.scale);
   }
 }
 
@@ -781,7 +789,8 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}): CreateBallp
   });
   let spheres: Z;
   threeInstance.renderer.toneMapping = ACESFilmicToneMapping;
-  threeInstance.camera.position.set(0, 0, 20);
+  threeInstance.scene.background = new Color(0x0000ff); // Add a blue background to the scene
+  threeInstance.camera.position.set(0, 0, 25); // Move camera slightly further
   threeInstance.camera.lookAt(0, 0, 0);
   threeInstance.cameraMaxAspect = 1.5;
   threeInstance.resize();
@@ -865,7 +874,6 @@ const Ballpit: React.FC<BallpitProps> = ({ className = '', followCursor = true, 
         spheresInstanceRef.current.dispose();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <canvas className={`${className} w-full h-full`} ref={canvasRef} />;
