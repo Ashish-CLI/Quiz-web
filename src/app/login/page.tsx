@@ -14,7 +14,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     try {
