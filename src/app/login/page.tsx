@@ -35,7 +35,7 @@ export default function Login() {
 
 
       // Redirect to protected area
-      router.push("/dashboard");
+      router.push("/sdashboard");
     } catch (err) {
       console.error("Login request error:", err);
       setError("An unexpected error occurred");

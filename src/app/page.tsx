@@ -9,9 +9,9 @@ import Quiz from "../components/Quiz";
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
+  /*useEffect(() => {
     router.push("/sdashboard");
-  }, [router]);
+  }, [router]);*/
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -23,8 +23,9 @@ export default function Home() {
         Go to Login
       </Link>
     </div>
+
     /*<div className="flex flex-col min-h-screen">
-      <Quiz/>
+      <Quiz quiz_id={""}/>
     </div>*/
   );
 }

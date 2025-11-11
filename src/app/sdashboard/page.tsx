@@ -1,9 +1,39 @@
 "use client";
 
+import Dashboard from "@/components/dashboard";
+import { useState, useEffect } from "react";
+
+interface User {
+  id: number;
+  userName: string;
+  email: string;
+  role: string;
+}
 
 export default function Sdashboard() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        const response = await fetch("/api/auth/user");
+         // Assuming this endpoint exists
+        if (response.ok) {
+          const userData = await response.json();
+          console.log("Fetched user data:", userData);
+          setUser(userData.data);
+        } else {
+          console.error("Failed to fetch user data");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+    fetchUserData();
+  }, []);
+
   return (
-    <div className="sdashmain flex flex-col relative min-h-screen md:flex-row">
+    <div className="sdashmain flex flex-col relative h-screen md:flex-row">
       {/*left part*/}
       <div className="sdashleft w-full md:w-1/5 bg-[#695ae0] flex-row ">
         <ul className="flex-row  space-y-6 mt-20 mx-5 text-2xl">
@@ -54,7 +84,9 @@ export default function Sdashboard() {
         </ul>
       </div>
       {/*right part*/}
-      <div className="sdashright w-full md:w-4/5 bg-black "></div>
+      <div className="sdashright w-full md:w-4/5 h-full">
+        {user && <Dashboard user_id={user.id} username={user.userName} />}
+      </div>
     </div>
   );
 }

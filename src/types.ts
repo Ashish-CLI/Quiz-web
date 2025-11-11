@@ -46,8 +46,9 @@ export interface RegisterRequestBody {
 
 export interface UserQueryResult {
   user_id: string;
-  username: string;
+  user_name: string;
   email: string;
+  role: string;
   password_hash: string;
   registration_date: string;
 }
