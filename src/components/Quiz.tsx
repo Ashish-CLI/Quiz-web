@@ -24,7 +24,7 @@ export default function Quiz({ quiz_id }: QuizProps) {
         }
         const data: QuizData = await response.json();
         setQuizData(data);
-        setQuestions(data.questions);
+        setQuestions(data.questions || []);
       } catch (err) {
         setError("Failed to fetch quiz data.");
         console.error(err);

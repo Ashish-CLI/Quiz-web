@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { ExpandableCardDemo } from "./quiz-card";
+import { QuizCardData } from "@/types";
 
 
 interface DashboardProps {
@@ -22,6 +24,8 @@ export default function Dashboard({ user_id, username }: DashboardProps) {
     const [difficulty, setDifficulty] = useState("any");
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedCategory, setSelectedCategory] = useState("any");
+    const [quizCards, setQuizCards] = useState<QuizCardData[]>([]);
+    const [allQuizCards, setAllQuizCards] = useState<QuizCardData[]>([]);
 
     useEffect(() => {
         const randomIndex = Math.floor(Math.random() * profilePhotos.length);
@@ -40,15 +44,50 @@ export default function Dashboard({ user_id, username }: DashboardProps) {
                 console.error("Error fetching categories:", error);
             }
         }
+
+        async function fetchQuizCards() {
+            try {
+                const response = await fetch("/api/quiz-cards");
+                if (response.ok) {
+                    const data = await response.json();
+                    setAllQuizCards(data.data);
+                    setQuizCards(data.data);
+                } else {
+                    console.error("Failed to fetch quiz cards");
+                }
+            } catch (error) {
+                console.error("Error fetching quiz cards:", error);
+            }
+        }
+
         fetchCategories();
+        fetchQuizCards();
     }, []);
 
     const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setDifficulty(event.target.value);
+        const newDifficulty = event.target.value;
+        setDifficulty(newDifficulty);
+        filterQuizCards(newDifficulty, selectedCategory);
     };
 
     const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(event.target.value);
+        const newCategory = event.target.value;
+        setSelectedCategory(newCategory);
+        filterQuizCards(difficulty, newCategory);
+    };
+
+    const filterQuizCards = (selectedDifficulty: string, selectedCat: string) => {
+        let filteredCards = allQuizCards;
+
+        if (selectedDifficulty !== "any") {
+            filteredCards = filteredCards.filter(card => card.difficulty === selectedDifficulty);
+        }
+
+        if (selectedCat !== "any") {
+            filteredCards = filteredCards.filter(card => card.cat_id === selectedCat);
+        }
+
+        setQuizCards(filteredCards);
     };
 
     return (
@@ -106,8 +145,10 @@ export default function Dashboard({ user_id, username }: DashboardProps) {
 
             </div>
             {/* lower part */}
-            <div className="dashboard-lower w-full h-2/3 flex flex-col md:flex-row bg-red-600 ">
-                </div>
+            <div className="dashboard-lower w-full h-2/3 flex  md:flex-row bg-emerald-200 p-4 m-2 overflow-y-auto">
+                <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} />
+            </div></div>
+                
         </div>
     );
 }

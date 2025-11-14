@@ -18,9 +18,19 @@ export interface QuizData {
   creation_date: string;
   difficulty: string;
   creator_id: string;
+  creatorName?: string;
   cat_id: string;
   question_no: number;
   questions: Question[];
+}
+
+export interface QuizCardData {
+  quiz_id: string;
+  title: string;
+  creatorName: string;
+  questions: { question_text: string }[];
+  difficulty: string;
+  cat_id: string;
 }
 
 export interface User {
@@ -29,6 +39,7 @@ export interface User {
   email: string;
   password_hash: string;
   registration_date: string;
+  role: string;
 }
 
 export interface LoginRequestBody {

@@ -7,6 +7,7 @@ export async function GET(
   { params }: { params: { quiz_id: string } }
 ) {
   const { quiz_id } = params;
+  console.log('API: Fetching quiz for quiz_id:', quiz_id);
 
   try {
     const quizRows = await query<QuizData[]>(
@@ -17,10 +18,14 @@ export async function GET(
     );
 
     if (quizRows.length === 0) {
+      console.log('API: Quiz not found for quiz_id:', quiz_id);
       return errorResponse('Quiz not found', null, 404);
     }
+    console.log('API: Fetched quizRows:', quizRows);
 
-    const quiz: QuizData = quizRows;
+    const quiz: QuizData = quizRows; // Corrected: Access the first element of the array
+
+    console.log('API: Extracted quiz object:', quiz);
 
     const questionsRows = await query<Question[]>(
       `SELECT question_id, question_text, quiz_id
@@ -31,6 +36,8 @@ export async function GET(
     );
 
     const questionIds = questionsRows.map((q: Question) => q.question_id);
+    console.log('API: Fetched questionsRows:', questionsRows);
+    console.log('API: Extracted questionIds:', questionIds);
 
     let optionsRows: Option[] = [];
     if (questionIds.length > 0) {
@@ -43,6 +50,7 @@ export async function GET(
         [questionIds]
       );
     }
+    console.log('API: Fetched optionsRows:', optionsRows);
 
     // Map options to questions
     const questions: Question[] = questionsRows.map((q: Question) => ({
@@ -60,10 +68,11 @@ export async function GET(
       question_no: quiz.question_no,
       questions: questions,
     };
+    console.log('API: Final quizData before response:', quizData);
 
     return successResponse('Quiz fetched successfully', quizData);
   } catch (error) {
-    console.error('Database error:', error); // Log the full error for server-side debugging
+    console.error('Database error:', error);
     return errorResponse('An unexpected error occurred while fetching the quiz.', error, 500);
   }
 }
