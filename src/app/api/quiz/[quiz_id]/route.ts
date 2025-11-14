@@ -6,8 +6,7 @@ export async function GET(
   request: Request,
   { params }: { params: { quiz_id: string } }
 ) {
-  const { quiz_id } = params;
-  console.log('API: Fetching quiz for quiz_id:', quiz_id);
+  const { quiz_id } = await params;
 
   try {
     const quizRows = await query<QuizData[]>(
@@ -17,15 +16,13 @@ export async function GET(
       [quiz_id]
     );
 
+    
     if (quizRows.length === 0) {
-      console.log('API: Quiz not found for quiz_id:', quiz_id);
       return errorResponse('Quiz not found', null, 404);
     }
-    console.log('API: Fetched quizRows:', quizRows);
 
-    const quiz: QuizData = quizRows; // Corrected: Access the first element of the array
+    const quiz: QuizData = quizRows[0]; // Corrected: Access the first element of the array
 
-    console.log('API: Extracted quiz object:', quiz);
 
     const questionsRows = await query<Question[]>(
       `SELECT question_id, question_text, quiz_id
@@ -36,21 +33,19 @@ export async function GET(
     );
 
     const questionIds = questionsRows.map((q: Question) => q.question_id);
-    console.log('API: Fetched questionsRows:', questionsRows);
-    console.log('API: Extracted questionIds:', questionIds);
 
     let optionsRows: Option[] = [];
     if (questionIds.length > 0) {
-      // Fetch all options for all questions in a single query
+      // Dynamically create placeholders for the IN clause
+      const placeholders = questionIds.map(() => '?').join(',');
       optionsRows = await query<Option[]>(
         `SELECT option_id, option_text, is_correct, question_id
          FROM quiz.options
-         WHERE question_id IN (?)
+         WHERE question_id IN (${placeholders})
          ORDER BY question_id, option_id`,
-        [questionIds]
+        questionIds
       );
     }
-    console.log('API: Fetched optionsRows:', optionsRows);
 
     // Map options to questions
     const questions: Question[] = questionsRows.map((q: Question) => ({
@@ -68,7 +63,6 @@ export async function GET(
       question_no: quiz.question_no,
       questions: questions,
     };
-    console.log('API: Final quizData before response:', quizData);
 
     return successResponse('Quiz fetched successfully', quizData);
   } catch (error) {

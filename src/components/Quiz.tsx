@@ -22,7 +22,8 @@ export default function Quiz({ quiz_id }: QuizProps) {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: QuizData = await response.json();
+        const responseData = await response.json();
+        const data: QuizData = responseData.data;
         setQuizData(data);
         setQuestions(data.questions || []);
       } catch (err) {
