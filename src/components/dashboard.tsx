@@ -7,6 +7,7 @@ import { QuizCardData } from "@/types";
 interface DashboardProps {
     user_id: number;
     username: string;
+    userRole?: string;
 }
 
 interface Category {
@@ -19,7 +20,7 @@ const profilePhotos = [
     // Add more profile photo paths here if available
 ];
 
-export default function Dashboard({ user_id, username }: DashboardProps) {
+export default function Dashboard({ user_id, username, userRole }: DashboardProps) {
     const [currentProfilePhoto, setCurrentProfilePhoto] = useState("");
     const [difficulty, setDifficulty] = useState("any");
     const [categories, setCategories] = useState<Category[]>([]);
@@ -145,8 +146,8 @@ export default function Dashboard({ user_id, username }: DashboardProps) {
 
             </div>
             {/* lower part */}
-            <div className="dashboard-lower w-full h-2/3 flex  md:flex-row bg-emerald-200 p-4 m-2 overflow-y-auto">
-                <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} />
+            <div className="dashboard-lower w-full h-2/3 flex  md:flex-row bg-emerald-200 p-4 overflow-y-auto">
+              <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} userRole={userRole} />
             </div></div>
                 
         </div>
