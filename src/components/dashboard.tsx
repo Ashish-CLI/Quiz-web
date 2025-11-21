@@ -140,7 +140,7 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
                             className="rounded-xl"
                         />
                     )}
-                    <p className="text-xl text-white font-bold">{username}</p>
+                    <p className="text-xl text-white font-bold mt-2">{username}</p>
                 </div>
 
             </div>

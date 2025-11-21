@@ -35,7 +35,9 @@ export default function Sdashboard() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const response = await fetch("/api/auth/user");
+        const response = await fetch("/api/auth/user", {
+          credentials: "include",
+        });
         if (response.ok) {
           const userData = await response.json();
           console.log("Fetched user data:", userData);

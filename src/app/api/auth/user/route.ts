@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
     return successResponse('User data fetched successfully', {
       id: user.user_id,
-      userName: user.user_name,
+      username: user.user_name,
       email: user.email,
       role: user.role,
     });

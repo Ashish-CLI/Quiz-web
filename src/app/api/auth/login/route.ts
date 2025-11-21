@@ -50,10 +50,9 @@ export async function POST(request: Request) {
     const oneHour = 60 * 60 * 1000;
     (await cookies()).set('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       expires: Date.now() + oneHour,
-      path: '/',
     });
 
     return successResponse('Login successful', {
