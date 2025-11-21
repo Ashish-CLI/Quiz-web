@@ -1,23 +1,22 @@
 "use client";
 
 import Dashboard from "@/components/dashboard";
+import { Admin } from "@/components/admin"; // Import the Admin component
+import { ExpandableCardDemo } from "@/components/quiz-card"; // Import the QuizCard component
 import { useState, useEffect } from "react";
+import { User } from "@/types"; // Import the User interface from types.ts
 
-interface User {
-  id: number;
-  userName: string;
-  email: string;
-  role: string;
-}
 
 export default function Sdashboard() {
   const [user, setUser] = useState<User | null>(null);
+  const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin">(
+    "dashboard"
+  );
 
   useEffect(() => {
     async function fetchUserData() {
       try {
         const response = await fetch("/api/auth/user");
-        // Assuming this endpoint exists
         if (response.ok) {
           const userData = await response.json();
           console.log("Fetched user data:", userData);
@@ -49,7 +48,9 @@ export default function Sdashboard() {
                 d="M8 20H3V10H0L10 0l10 10h-3v10h-5v-6H8v6z"
               />
             </svg>
-            <button className="mt-0.5">Dashboard</button>
+            <button className="mt-0.5" onClick={() => setActiveComponent("dashboard")}>
+              Dashboard
+            </button>
           </li>
           <li className="flex gap-5 items-center">
             <svg
@@ -67,35 +68,46 @@ export default function Sdashboard() {
             </svg>
             <button className="mt-0.5">Account</button>
           </li>
-          <li className="flex gap-5 items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="#ffffff"
-              stroke="#ffffff"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="4" y1="21" x2="4" y2="14"></line>
-              <line x1="4" y1="10" x2="4" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12" y2="3"></line>
-              <line x1="20" y1="21" x2="20" y2="16"></line>
-              <line x1="20" y1="12" x2="20" y2="3"></line>
-              <line x1="1" y1="14" x2="7" y2="14"></line>
-              <line x1="9" y1="8" x2="15" y2="8"></line>
-              <line x1="17" y1="16" x2="23" y2="16"></line>
-            </svg>
-            <button className="mt-0.5">Admin</button>
-          </li>
+          {user?.role === "admin" && (
+            <li className="flex gap-5 items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="#ffffff"
+                stroke="#ffffff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              <button className="mt-0.5" onClick={() => setActiveComponent("admin")}>
+                Admin
+              </button>
+            </li>
+
+            
+          )}
         </ul>
       </div>
       {/*right part*/}
-      <div className="sdashright w-full md:w-4/5 h-full">
-        {user && <Dashboard user_id={user.id} username={user.userName} userRole={user.role} />}
+      <div className="sdashright w-full md:w-4/5 h-full overflow-y-auto">
+        {activeComponent === "dashboard" && user && (
+          <Dashboard user_id={user.user_id} username={user.username} userRole={user.role} />
+        )}
+        {activeComponent === "admin" && user?.role === "admin" && (
+          <Admin userId={user.user_id} />
+        )}
       </div>
     </div>
   );

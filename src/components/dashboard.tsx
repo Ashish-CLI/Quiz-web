@@ -5,7 +5,7 @@ import { QuizCardData } from "@/types";
 
 
 interface DashboardProps {
-    user_id: number;
+    user_id: string;
     username: string;
     userRole?: string;
 }
@@ -17,7 +17,6 @@ interface Category {
 
 const profilePhotos = [
     "/profile-photos/dummy.jpg",
-    // Add more profile photo paths here if available
 ];
 
 export default function Dashboard({ user_id, username, userRole }: DashboardProps) {
@@ -141,7 +140,7 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
                             className="rounded-xl"
                         />
                     )}
-                    <p className="text-xl font-bold">{username}</p>
+                    <p className="text-xl text-white font-bold">{username}</p>
                 </div>
 
             </div>

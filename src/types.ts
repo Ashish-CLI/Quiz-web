@@ -86,3 +86,8 @@ export interface QuizQueryResult {
   cat_id: string;
   question_no: number;
 }
+
+export interface Category {
+  cat_id: string;
+  cat_name: string;
+}

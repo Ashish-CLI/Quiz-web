@@ -70,3 +70,38 @@ export async function GET(
     return errorResponse('An unexpected error occurred while fetching the quiz.', error, 500);
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { quiz_id: string } }
+) {
+  const { quiz_id } = params;
+
+  try {
+    // Delete options associated with the quiz's questions
+    await query(
+      `DELETE FROM quiz.options
+       WHERE question_id IN (SELECT question_id FROM quiz.questions WHERE quiz_id = ?)`,
+      [quiz_id]
+    );
+
+    // Delete questions associated with the quiz
+    await query(
+      `DELETE FROM quiz.questions
+       WHERE quiz_id = ?`,
+      [quiz_id]
+    );
+
+    // Delete the quiz itself
+    await query(
+      `DELETE FROM quiz.quizzes
+       WHERE quiz_id = ?`,
+      [quiz_id]
+    );
+
+    return successResponse('Quiz deleted successfully', null);
+  } catch (error) {
+    console.error('Database error:', error);
+    return errorResponse('An unexpected error occurred while deleting the quiz.', error, 500);
+  }
+}

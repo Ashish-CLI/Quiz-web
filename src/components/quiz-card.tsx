@@ -57,7 +57,7 @@ export function ExpandableCardDemo({ quizCards, userRole }: ExpandableCardDemoPr
       </AnimatePresence>
       <AnimatePresence>
         {active && typeof active === "object" ? (
-          <div className="fixed inset-0  grid place-items-center z-[100]">
+          <div className="fixed inset-0  grid place-items-center z-20">
             <motion.button
               key={`button-${active.quiz_id}-${id}`}
               layout
