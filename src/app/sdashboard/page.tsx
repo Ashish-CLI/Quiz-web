@@ -5,6 +5,7 @@ import { Admin } from "@/components/admin"; // Import the Admin component
 import { ExpandableCardDemo } from "@/components/quiz-card"; // Import the QuizCard component
 import { useState, useEffect } from "react";
 import { User } from "@/types"; // Import the User interface from types.ts
+import { useRouter } from "next/navigation";
 
 
 export default function Sdashboard() {
@@ -12,6 +13,24 @@ export default function Sdashboard() {
   const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin">(
     "dashboard"
   );
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+      if (response.ok) {
+        setUser(null);
+        router.push("/login");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   useEffect(() => {
     async function fetchUserData() {
@@ -34,7 +53,7 @@ export default function Sdashboard() {
   return (
     <div className="sdashmain flex flex-col relative h-screen md:flex-row">
       {/*left part*/}
-      <div className="sdashleft w-full md:w-1/5 bg-[#695ae0] flex-row ">
+      <div className="sdashleft w-full md:w-1/5 bg-[#695ae0] flex-row relative">
         <ul className="flex-row  space-y-6 mt-20 mx-5 text-2xl">
           <li className="flex gap-5 items-center">
             <svg
@@ -99,6 +118,28 @@ export default function Sdashboard() {
             
           )}
         </ul>
+        <div className="absolute bottom-4 left-0 w-full">
+            <ul className="relative space-y-6 mx-5 text-2xl">
+                <li className="flex gap-5 items-center hover:bg-[#8d7ff2] p-2 rounded-lg cursor-pointer transition-colors duration-200" onClick={handleLogout}>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <button className="mt-0.5">Logout</button>
+                </li>
+            </ul>
+        </div>
       </div>
       {/*right part*/}
       <div className="sdashright w-full md:w-4/5 h-full overflow-y-auto">
