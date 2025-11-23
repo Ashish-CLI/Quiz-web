@@ -146,7 +146,7 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
             </div>
             {/* lower part */}
             <div className="dashboard-lower w-full h-2/3 flex  md:flex-row bg-emerald-200 p-4 overflow-y-auto">
-              <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} userRole={userRole} />
+              <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} userRole={userRole} user_id={user_id} />
             </div></div>
                 
         </div>

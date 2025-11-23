@@ -8,7 +8,6 @@ import { UserQueryResult } from '@/types';
 export async function GET(request: Request) {
   try {
     const token = (await cookies()).get('token')?.value;
-
     if (!token) {
       return errorResponse('Unauthorized', null, 401);
     }

@@ -27,9 +27,10 @@ export default function Login() {
       });
 
       const data = await response.json();
+      console.log("Login API response:", data); // Log the response for debugging
 
       if (!response.ok) {
-        setError(data.error || "Login failed");
+        setError(data.message || data.error || "Login failed"); // More robust error message
         return;
       }
 

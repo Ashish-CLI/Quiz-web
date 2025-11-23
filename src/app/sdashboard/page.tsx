@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function Sdashboard() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin">(
     "dashboard"
   );
@@ -40,17 +41,31 @@ export default function Sdashboard() {
         });
         if (response.ok) {
           const userData = await response.json();
-          console.log("Fetched user data:", userData);
-          setUser(userData.data);
+          if (userData.data && userData.data.id) {
+            setUser({ ...userData.data, user_id: userData.data.id });
+          } else {
+            setUser(userData.data); // Fallback if id is not present
+          }
         } else {
           console.error("Failed to fetch user data");
+          router.push("/login"); // Redirect here if API call fails or response is not ok
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+        router.push("/login"); // Redirect here if there's an network/other error
+      } finally {
+        setLoading(false); // Set loading to false after fetch attempt
       }
     }
     fetchUserData();
-  }, []);
+  }, [router]); // Only router as a dependency, to avoid unnecessary re-runs
+
+  if (loading) {
+    return <div>Loading user data...</div>; // Show loading state
+  }
+
+  // No need for the second !user || !user.user_id check here, as it's handled by the useEffect above
+  // The component will return null from the useEffect, or render if user is available
 
   return (
     <div className="sdashmain flex flex-col relative h-screen md:flex-row">
@@ -145,10 +160,10 @@ export default function Sdashboard() {
       </div>
       {/*right part*/}
       <div className="sdashright w-full md:w-4/5 h-full overflow-y-auto">
-        {activeComponent === "dashboard" && user && (
+        {activeComponent === "dashboard" && user && user.user_id && (
           <Dashboard user_id={user.user_id} username={user.username} userRole={user.role} />
         )}
-        {activeComponent === "admin" && user?.role === "admin" && (
+        {activeComponent === "admin" && user?.role === "admin" && user.user_id && (
           <Admin userId={user.user_id} />
         )}
       </div>

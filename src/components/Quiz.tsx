@@ -3,15 +3,31 @@ import { Question, Option, QuizData } from "../types";
 
 interface QuizProps {
   quiz_id: string;
+  user_id: string;
 }
 
-export default function Quiz({ quiz_id }: QuizProps) {
+export default function Quiz({ quiz_id, user_id }: QuizProps) {
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: string | null }>({});
   const [submittedQuestions, setSubmittedQuestions] = useState<{ [key: string]: boolean }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log("[Quiz.tsx] Component mounted or updated.");
+    console.log("[Quiz.tsx] Current loading state:", loading);
+    console.log("[Quiz.tsx] Current error state:", error);
+    console.log("[Quiz.tsx] Quiz Data (on update):", quizData);
+    console.log("[Quiz.tsx] Questions (on update):", questions);
+  }, [loading, error, quizData, questions]);
+
+  useEffect(() => {
+    const startQuizTime = Date.now();
+    setStartTime(startQuizTime);
+  }, []);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -34,13 +50,77 @@ export default function Quiz({ quiz_id }: QuizProps) {
       }
     };
 
+    console.log("[useEffect-fetchQuizData] Calling fetchQuizData for quiz_id:", quiz_id);
     fetchQuizData();
   }, [quiz_id]);
+
+  useEffect(() => {
+    console.log("[useEffect-startTime] Quiz start time set:", startTime);
+  }, [startTime]);
 
   const handleAnswerClick = (questionId: string, option: Option) => {
     if (!submittedQuestions[questionId]) {
       setSelectedAnswers((prev) => ({ ...prev, [questionId]: option.option_text }));
       setSubmittedQuestions((prev) => ({ ...prev, [questionId]: true }));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (Object.keys(selectedAnswers).length !== questions.length) {
+      alert("Please attempt all questions before submitting.");
+      return;
+    }
+
+    if (!startTime) {
+      alert("Quiz start time not recorded. Please refresh and try again.");
+      return;
+    }
+
+    let correctAnswers = 0;
+    questions.forEach((question) => {
+      const selectedOptionText = selectedAnswers[question.question_id];
+      const correctOption = question.options.find((opt) => opt.is_correct);
+      if (selectedOptionText && correctOption && selectedOptionText === correctOption.option_text) {
+        correctAnswers++;
+      }
+    });
+
+    const score = (correctAnswers / questions.length) * 100;
+    const time_taken = Math.round((Date.now() - startTime) / 1000); // in seconds
+
+    if (!user_id) {
+      alert("User ID not provided. Please log in again.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/quiz/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          quiz_id: quiz_id,
+          user_id: user_id,
+          score: score,
+          time_taken: time_taken,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (result.success) {
+        setQuizSubmitted(true);
+        // Optionally redirect or show a success message
+      } else {
+        alert(`Failed to submit quiz: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+      alert("An error occurred while submitting the quiz. Please try again.");
     }
   };
 
@@ -185,8 +265,22 @@ export default function Quiz({ quiz_id }: QuizProps) {
               ))}
             </div>
           </div>
+          {!quizSubmitted && (
+            <button
+              onClick={handleSubmit}
+              className="mt-8 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              Submit Quiz
+            </button>
+          )}
+          {quizSubmitted && (
+            <div className="mt-8 p-4 bg-green-700 text-white text-xl rounded-lg">
+              Quiz submitted successfully!
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
+

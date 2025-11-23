@@ -8,9 +8,10 @@ import { QuizCardData } from "@/types";
 interface ExpandableCardDemoProps {
   quizCards: QuizCardData[];
   userRole?: string;
+  user_id: string;
 }
 
-export function ExpandableCardDemo({ quizCards, userRole }: ExpandableCardDemoProps) {
+export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableCardDemoProps) {
   const [CurrentCardPhoto, setCurrentCardPhoto] = useState("");
   const [active, setActive] = useState<QuizCardData | boolean | null>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -130,7 +131,7 @@ export function ExpandableCardDemo({ quizCards, userRole }: ExpandableCardDemoPr
                       className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
                       onClick={(e) => {
                         e.stopPropagation();
-                        router.push(`/quiz/${active.quiz_id}`);
+                        router.push(`/quiz/${active.quiz_id}?user_id=${user_id || ''}`);
                       }}
                     >
                       Start Quiz
@@ -212,7 +213,7 @@ export function ExpandableCardDemo({ quizCards, userRole }: ExpandableCardDemoPr
                 className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-green-500 hover:text-white text-black mt-4 md:mt-0"
                 onClick={(e) => {
                   e.stopPropagation();
-                  router.push(`/quiz/${card.quiz_id}`);
+                  router.push(`/quiz/${card.quiz_id}?user_id=${user_id || ''}`);
                 }}
               >
                 Start
