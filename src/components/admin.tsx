@@ -326,7 +326,7 @@ export function Admin({ userId }: { userId: string }) {
                                     ></textarea>
                                 </div>
                                 <div className="mt-4 space-y-2">
-                                    <h4 className="text-md font-medium text-gray-700">Options (Exactly 4):</h4>
+                                    <h4 className="text-md font-medium text-gray-700">Options:</h4>
                                     {question.options?.map((option, oIndex) => (
                                         <div key={option.option_id} className="flex items-center space-x-2">
                                             <input

@@ -10,6 +10,11 @@ const pool = mysql.createPool({
 });
 
 export async function query<T = any>(sql: string, params?: any[]): Promise<T> {
+  console.log('--- DB QUERY ---');
+  console.log('SQL:', sql);
+  console.log('PARAMS:', params);
   const [rows] = await pool.execute(sql, params);
+  console.log('RESULT:', JSON.stringify(rows, null, 2));
+  console.log('--- END DB QUERY ---');
   return rows as T;
 }

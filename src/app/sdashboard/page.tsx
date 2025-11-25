@@ -4,6 +4,7 @@ import Dashboard from "@/components/dashboard";
 import { Admin } from "@/components/admin";
 import { ExpandableCardDemo } from "@/components/quiz-card";
 import { useState, useEffect } from "react";
+import Results from "@/components/Results";
 import { User } from "@/types";
 import { useRouter } from "next/navigation";
 
@@ -11,7 +12,7 @@ import { useRouter } from "next/navigation";
 export default function Sdashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin">(
+  const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin" | "results">(
     "dashboard"
   );
 
@@ -101,6 +102,28 @@ export default function Sdashboard() {
             </svg>
             <button className="mt-0.5">Account</button>
           </li>
+          <li className="flex gap-5 items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width={24}
+              height={24}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1V21c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h11.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.9L15.5 2z" />
+              <path d="M15 2v5h5" />
+              <path d="M10 16h4" />
+              <path d="M10 12h7" />
+              <path d="M10 8h7" />
+            </svg>
+            <button className="mt-0.5" onClick={() => setActiveComponent("results")}>
+              Results
+            </button>
+          </li>
           {user?.role === "admin" && (
             <li className="flex gap-5 items-center">
               <svg
@@ -128,8 +151,6 @@ export default function Sdashboard() {
                 Admin
               </button>
             </li>
-
-            
           )}
         </ul>
         <div className="absolute bottom-4 left-0 w-full">
@@ -162,6 +183,9 @@ export default function Sdashboard() {
         )}
         {activeComponent === "admin" && user?.role === "admin" && user.user_id && (
           <Admin userId={user.user_id} />
+        )}
+        {activeComponent === "results" && user && user.user_id && (
+          <Results user_id={user.user_id} />
         )}
         
       </div>
