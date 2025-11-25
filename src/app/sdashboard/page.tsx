@@ -1,16 +1,16 @@
 "use client";
 
 import Dashboard from "@/components/dashboard";
-import { Admin } from "@/components/admin"; // Import the Admin component
-import { ExpandableCardDemo } from "@/components/quiz-card"; // Import the QuizCard component
+import { Admin } from "@/components/admin";
+import { ExpandableCardDemo } from "@/components/quiz-card";
 import { useState, useEffect } from "react";
-import { User } from "@/types"; // Import the User interface from types.ts
+import { User } from "@/types";
 import { useRouter } from "next/navigation";
 
 
 export default function Sdashboard() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const [activeComponent, setActiveComponent] = useState<"dashboard" | "admin">(
     "dashboard"
   );
@@ -44,28 +44,25 @@ export default function Sdashboard() {
           if (userData.data && userData.data.id) {
             setUser({ ...userData.data, user_id: userData.data.id });
           } else {
-            setUser(userData.data); // Fallback if id is not present
+            setUser(userData.data);
           }
         } else {
           console.error("Failed to fetch user data");
-          router.push("/login"); // Redirect here if API call fails or response is not ok
+          router.push("/login");
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        router.push("/login"); // Redirect here if there's an network/other error
+        router.push("/login");
       } finally {
-        setLoading(false); // Set loading to false after fetch attempt
+        setLoading(false);
       }
     }
     fetchUserData();
-  }, [router]); // Only router as a dependency, to avoid unnecessary re-runs
+  }, [router]);
 
   if (loading) {
-    return <div>Loading user data...</div>; // Show loading state
+    return <div>Loading user data...</div>;
   }
-
-  // No need for the second !user || !user.user_id check here, as it's handled by the useEffect above
-  // The component will return null from the useEffect, or render if user is available
 
   return (
     <div className="sdashmain flex flex-col relative h-screen md:flex-row">
@@ -166,6 +163,7 @@ export default function Sdashboard() {
         {activeComponent === "admin" && user?.role === "admin" && user.user_id && (
           <Admin userId={user.user_id} />
         )}
+        
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: string | null }>({});
+  const [questionTimes, setQuestionTimes] = useState<{ [key: string]: number }>({});
+  const [lastQuestionTime, setLastQuestionTime] = useState<number | null>(null);
   const [submittedQuestions, setSubmittedQuestions] = useState<{ [key: string]: boolean }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +29,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
   useEffect(() => {
     const startQuizTime = Date.now();
     setStartTime(startQuizTime);
+    setLastQuestionTime(startQuizTime);
   }, []);
 
   useEffect(() => {
@@ -60,6 +63,12 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
 
   const handleAnswerClick = (questionId: string, option: Option) => {
     if (!submittedQuestions[questionId]) {
+      const now = Date.now();
+      if (lastQuestionTime) {
+        const timeTaken = Math.round((now - lastQuestionTime) / 1000);
+        setQuestionTimes((prev) => ({ ...prev, [questionId]: timeTaken }));
+      }
+      setLastQuestionTime(now);
       setSelectedAnswers((prev) => ({ ...prev, [questionId]: option.option_text }));
       setSubmittedQuestions((prev) => ({ ...prev, [questionId]: true }));
     }
@@ -77,12 +86,18 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
     }
 
     let correctAnswers = 0;
-    questions.forEach((question) => {
+    const attempt_details = questions.map((question) => {
       const selectedOptionText = selectedAnswers[question.question_id];
       const correctOption = question.options.find((opt) => opt.is_correct);
       if (selectedOptionText && correctOption && selectedOptionText === correctOption.option_text) {
         correctAnswers++;
       }
+      const selectedOption = question.options.find(opt => opt.option_text === selectedOptionText);
+      return {
+        question_id: question.question_id,
+        att_answer_id: selectedOption ? selectedOption.option_id : null,
+        time_taken: questionTimes[question.question_id] || 0,
+      };
     });
 
     const score = (correctAnswers / questions.length) * 100;
@@ -104,6 +119,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
           user_id: user_id,
           score: score,
           time_taken: time_taken,
+          attempt_details: attempt_details,
         }),
       });
 
@@ -114,7 +130,6 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
       const result = await response.json();
       if (result.success) {
         setQuizSubmitted(true);
-        // Optionally redirect or show a success message
       } else {
         alert(`Failed to submit quiz: ${result.message}`);
       }
