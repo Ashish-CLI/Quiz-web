@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Question, Option, QuizData } from "../types";
+import { useRouter } from "next/navigation";
 
 interface QuizProps {
   quiz_id: string;
@@ -7,6 +8,7 @@ interface QuizProps {
 }
 
 export default function Quiz({ quiz_id, user_id }: QuizProps) {
+  const router = useRouter();
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: string | null }>({});
@@ -130,6 +132,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
       const result = await response.json();
       if (result.success) {
         setQuizSubmitted(true);
+        router.push("/sdashboard");
       } else {
         alert(`Failed to submit quiz: ${result.message}`);
       }

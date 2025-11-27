@@ -3,158 +3,191 @@ import Image from "next/image";
 import { ExpandableCardDemo } from "./quiz-card";
 import { QuizCardData } from "@/types";
 
-
 interface DashboardProps {
-    user_id: string;
-    username: string;
-    userRole?: string;
+  user_id: string;
+  username: string;
+  userRole?: string;
 }
 
 interface Category {
-    cat_id: number;
-    cat_name: string;
+  cat_id: number;
+  cat_name: string;
 }
 
 const profilePhotos = [
-    "/profile-photos/profile1.jpg",
-    "/profile-photos/profile2.jpg",
-    "/profile-photos/profile3.jpg",
-    "/profile-photos/profile4.jpg",
-    "/profile-photos/profile5.jpg",
-    "/profile-photos/profile6.jpg",
-    
+  "/profile-photos/profile1.jpg",
+  "/profile-photos/profile2.jpg",
+  "/profile-photos/profile3.jpg",
+  "/profile-photos/profile4.jpg",
+  "/profile-photos/profile5.jpg",
+  "/profile-photos/profile6.jpg",
 ];
 
 export default function Dashboard({ user_id, username, userRole }: DashboardProps) {
-    const [currentProfilePhoto, setCurrentProfilePhoto] = useState("");
-    const [difficulty, setDifficulty] = useState("any");
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState("any");
-    const [quizCards, setQuizCards] = useState<QuizCardData[]>([]);
-    const [allQuizCards, setAllQuizCards] = useState<QuizCardData[]>([]);
+  const [currentProfilePhoto, setCurrentProfilePhoto] = useState("");
+  const [difficulty, setDifficulty] = useState("any");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("any");
+  const [quizCards, setQuizCards] = useState<QuizCardData[]>([]);
+  const [allQuizCards, setAllQuizCards] = useState<QuizCardData[]>([]);
+  const [isProfileOpen, setProfileOpen] = useState(false);
+  const [isFiltersOpen, setFiltersOpen] = useState(false);
 
-    useEffect(() => {
-        const randomIndex = Math.floor(Math.random() * profilePhotos.length);
-        setCurrentProfilePhoto(profilePhotos[randomIndex]);
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * profilePhotos.length);
+    setCurrentProfilePhoto(profilePhotos[randomIndex]);
 
-        async function fetchCategories() {
-            try {
-                const response = await fetch("/api/categories");
-                if (response.ok) {
-                    const data = await response.json();
-                    setCategories(data.data);
-                } else {
-                    console.error("Failed to fetch categories");
-                }
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            }
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/api/categories");
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.data);
+        } else {
+          console.error("Failed to fetch categories");
         }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    }
 
-        async function fetchQuizCards() {
-            try {
-                const response = await fetch("/api/quiz-cards");
-                if (response.ok) {
-                    const data = await response.json();
-                    setAllQuizCards(data.data);
-                    setQuizCards(data.data);
-                } else {
-                    console.error("Failed to fetch quiz cards");
-                }
-            } catch (error) {
-                console.error("Error fetching quiz cards:", error);
-            }
+    async function fetchQuizCards() {
+      try {
+        const response = await fetch("/api/quiz-cards");
+        if (response.ok) {
+          const data = await response.json();
+          setAllQuizCards(data.data);
+          setQuizCards(data.data);
+        } else {
+          console.error("Failed to fetch quiz cards");
         }
+      } catch (error) {
+        console.error("Error fetching quiz cards:", error);
+      }
+    }
 
-        fetchCategories();
-        fetchQuizCards();
-    }, []);
+    fetchCategories();
+    fetchQuizCards();
+  }, []);
 
-    const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const newDifficulty = event.target.value;
-        setDifficulty(newDifficulty);
-        filterQuizCards(newDifficulty, selectedCategory);
-    };
+  const filterQuizCards = (selectedDifficulty: string, selectedCat: string) => {
+    let filteredCards = allQuizCards;
 
-    const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const newCategory = event.target.value;
-        setSelectedCategory(newCategory);
-        filterQuizCards(difficulty, newCategory);
-    };
+    if (selectedDifficulty !== "any") {
+      filteredCards = filteredCards.filter(card => card.difficulty === selectedDifficulty);
+    }
 
-    const filterQuizCards = (selectedDifficulty: string, selectedCat: string) => {
-        let filteredCards = allQuizCards;
+    if (selectedCat !== "any") {
+      filteredCards = filteredCards.filter(card => card.cat_id.toString() === selectedCat);
+    }
 
-        if (selectedDifficulty !== "any") {
-            filteredCards = filteredCards.filter(card => card.difficulty === selectedDifficulty);
-        }
+    setQuizCards(filteredCards);
+  };
 
-        if (selectedCat !== "any") {
-            filteredCards = filteredCards.filter(card => card.cat_id === selectedCat);
-        }
+  const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDifficulty = event.target.value;
+    setDifficulty(newDifficulty);
+    filterQuizCards(newDifficulty, selectedCategory);
+  };
 
-        setQuizCards(filteredCards);
-    };
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newCategory = event.target.value;
+    setSelectedCategory(newCategory);
+    filterQuizCards(difficulty, newCategory);
+  };
 
-    return (
-        <div className="dashboard-main flex flex-col  h-full">
-            {/* upper part */}
-            <div className="dashboard-upper w-full h-1/3 flex flex-col md:flex-row ">
-            {/*upper left part pie chart*/}
-                <div className="dashboard-upper-left w-full md:w-1/2 bg-cyan-400 flex flex-row items-center justify-center gap-4 p-10">
-                    <div className="difficulty-selector mb-4">
-                        <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700">Difficulty:</label>
-                        <select
-                            id="difficulty"
-                            name="difficulty"
-                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                            value={difficulty}
-                            onChange={handleDifficultyChange}
-                        >
-                            <option value="any">Any</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                    <div className="category-selector mb-4">
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category:</label>
-                        <select
-                            id="category"
-                            name="category"
-                            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                        >
-                            <option value="any">Any</option>
-                            {categories.map((cat) => (
-                                <option key={cat.cat_id} value={cat.cat_id}>
-                                    {cat.cat_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                {/*upper right part profile*/}
-                <div className="dashboard-upper-right w-full md:w-1/2 bg-blue-500 flex flex-col items-center justify-center text-black">
-                    {currentProfilePhoto && (
-                        <Image
-                            src={currentProfilePhoto}
-                            alt="Profile"
-                            width={170}
-                            height={170}
-                            className="rounded-full border-4 border-white"
-                        />
-                    )}
-                    <p className="text-xl text-white font-bold mt-2">{username}</p>
-                </div>
-
+  return (
+    <div className="min-h-screen bg-gray-900 text-white font-sans">
+      {/* Header Section */}
+      <header className="bg-gray-800/50 backdrop-blur-sm shadow-lg p-6">
+        <div className="container  mx-auto">
+          <div className="flex  mb-6">
+            <div className="flex justify-center items-center space-x-6">
+              <button
+                onClick={() => setProfileOpen(!isProfileOpen)}
+                className="p-3 ml-2 rounded-full bg-gray-700 hover:bg-indigo-600 transition-colors duration-300"
+              >
+                Profile
+              </button>
+              <button
+                onClick={() => setFiltersOpen(!isFiltersOpen)}
+                className="p-3 mr-2 float-end rounded-full bg-gray-700 hover:bg-indigo-600 transition-colors duration-300"
+              >
+                Filters
+              </button>
             </div>
-            {/* lower part */}
-            <div className="dashboard-lower w-full h-2/3 flex  md:flex-row bg-emerald-200 p-4 overflow-y-auto">
-              <div className="items-center w-full"><ExpandableCardDemo quizCards={quizCards} userRole={userRole} user_id={user_id} />
-            </div></div>
-                
+          </div>
+          {/* Expandable User Profile Section */}
+          {isProfileOpen && (
+            <div className="bg-gray-800/60 items-center justify-center backdrop-blur-md p-6 rounded-2xl shadow-2xl mt-6">
+              <div className="flex items-center justify-center space-x-6">
+                {currentProfilePhoto && (
+                  <Image
+                    src={currentProfilePhoto}
+                    alt="Profile"
+                    width={100}
+                    height={100}
+                    className="rounded-full border-4 border-indigo-500"
+                  />
+                )}
+                <h2 className="text-3xl font-semibold">{username}</h2>
+              </div>
+            </div>
+          )}
+          {/* Expandable Filters Section */}
+          {isFiltersOpen && (
+            <div className="bg-gray-800/60 backdrop-blur-md p-6 rounded-2xl shadow-2xl mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Difficulty Filter */}
+                <div>
+                  <label htmlFor="difficulty" className="block text-lg font-medium mb-2">
+                    Difficulty
+                  </label>
+                  <select
+                    id="difficulty"
+                    name="difficulty"
+                    className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg shadow-md py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={difficulty}
+                    onChange={handleDifficultyChange}
+                  >
+                    <option value="any">Any</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                {/* Category Filter */}
+                <div>
+                  <label htmlFor="category" className="block text-lg font-medium mb-2">
+                    Category
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg shadow-md py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={selectedCategory}
+                    onChange={handleCategoryChange}
+                  >
+                    <option value="any">Any</option>
+                    {categories.map(cat => (
+                      <option key={cat.cat_id} value={cat.cat_id}>
+                        {cat.cat_name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-    );
+      </header>
+
+      {/*Quiz Cards */}
+      <main className="p-8">
+        <div className="container mx-auto">
+          <ExpandableCardDemo quizCards={quizCards} userRole={userRole} user_id={user_id} />
+        </div>
+      </main>
+    </div>
+  );
 }
