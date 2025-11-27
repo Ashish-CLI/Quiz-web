@@ -16,7 +16,13 @@ interface Category {
 }
 
 const profilePhotos = [
-    "/profile-photos/dummy.jpg",
+    "/profile-photos/profile1.jpg",
+    "/profile-photos/profile2.jpg",
+    "/profile-photos/profile3.jpg",
+    "/profile-photos/profile4.jpg",
+    "/profile-photos/profile5.jpg",
+    "/profile-photos/profile6.jpg",
+    
 ];
 
 export default function Dashboard({ user_id, username, userRole }: DashboardProps) {
@@ -135,9 +141,9 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
                         <Image
                             src={currentProfilePhoto}
                             alt="Profile"
-                            width={250}
-                            height={250}
-                            className="rounded-xl"
+                            width={170}
+                            height={170}
+                            className="rounded-full border-4 border-white"
                         />
                     )}
                     <p className="text-xl text-white font-bold mt-2">{username}</p>

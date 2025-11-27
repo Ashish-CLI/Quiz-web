@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import { env } from './env';
 
-const pool = mysql.createPool({
+export const pool = mysql.createPool({
   host: env.DB_HOST,
   port: Number(process.env.DB_PORT) || 3306,
   user: env.DB_USER,

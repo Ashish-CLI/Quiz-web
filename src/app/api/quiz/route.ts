@@ -1,37 +1,30 @@
-import { QuizData, Question, Option } from '@/types';
 import { successResponse, errorResponse } from '@/lib/apiResponse';
-import { query } from '@/lib/db';
+import { pool } from '@/lib/db';
+import { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const { title, difficulty, cat_id, creator_id, questions } = await request.json();
+  const connection = await pool.getConnection();
   try {
-    const newQuizData: QuizData = await request.json();
+    await connection.beginTransaction();
 
-    // Insert quiz
-    const quizResult = await query(
-      `INSERT INTO quiz.quizzes (title, difficulty, creator_id, cat_id, question_no)
-       VALUES (?, ?, ?, ?, ?)`,
-      [
-        newQuizData.title,
-        newQuizData.difficulty,
-        newQuizData.creator_id,
-        newQuizData.cat_id,
-        newQuizData.questions.length,
-      ]
+    const quizResult = await connection.query(
+      `INSERT INTO quiz.quizzes (title, difficulty, cat_id, creator_id, creation_date, question_no)
+       VALUES (?, ?, ?, ?, NOW(), ?)`,
+      [title, difficulty, cat_id, creator_id, questions.length]
     );
 
     const quizId = (quizResult as any).insertId;
 
-    // Insert questions and options
-    for (const question of newQuizData.questions) {
-      const questionResult = await query(
+    for (const question of questions) {
+      const questionResult = await connection.query(
         `INSERT INTO quiz.questions (question_text, quiz_id)
          VALUES (?, ?)`,
         [question.question_text, quizId]
       );
       const questionId = (questionResult as any).insertId;
-
       for (const option of question.options) {
-        await query(
+        await connection.query(
           `INSERT INTO quiz.options (option_text, is_correct, question_id)
            VALUES (?, ?, ?)`,
           [option.option_text, option.is_correct, questionId]
@@ -39,9 +32,13 @@ export async function POST(request: Request) {
       }
     }
 
-    return successResponse('Quiz added successfully', { quizId });
+    await connection.commit();
+    return successResponse("Quiz created successfully", { quiz_id: quizId });
   } catch (error) {
-    console.error('Database error:', error);
-    return errorResponse('An unexpected error occurred while adding the quiz.', error, 500);
+    console.error("Database error:", error);
+    await connection.rollback();
+    return errorResponse("An unexpected error occurred while creating the quiz.", error, 500);
+  } finally {
+    connection.release();
   }
 }

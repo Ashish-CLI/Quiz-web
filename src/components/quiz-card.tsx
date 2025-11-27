@@ -201,8 +201,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                   className="px-4 py-2 text-sm rounded-full font-bold bg-blue-500 text-white mt-4 md:mt-0"
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Handle edit functionality
-                    console.log("Edit quiz:", card.quiz_id);
+                    router.push(`/edit-quiz?quiz_id=${card.quiz_id}`);
                   }}
                 >
                   Edit
