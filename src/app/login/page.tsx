@@ -3,8 +3,12 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import LoginBg from "@/components/login-bg1";
-import Image from "next/image";
+import dynamic from 'next/dynamic';
+
+const LoginBg = dynamic(() => import('@/components/login-bg1'), { 
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-black -z-10" /> // Prevents flash of white
+});
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -45,12 +49,8 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
-      <div
-        className="absolute inset-0 z-[-1]"
-      >
-        <LoginBg
-        followCursor={false}
-        />
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
+        <LoginBg followCursor={false} />
       </div>
       {/* Logo */}
       <div className="w-full max-w-md z-10 dark p-5">

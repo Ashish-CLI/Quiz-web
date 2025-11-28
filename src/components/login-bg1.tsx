@@ -10,7 +10,6 @@ import {
   Vector2,
   Vector3,
   MeshPhysicalMaterial,
-  MeshBasicMaterial, // Added MeshBasicMaterial
   ShaderChunk,
   Color,
   Object3D,
@@ -21,7 +20,7 @@ import {
   PointLight,
   ACESFilmicToneMapping,
   Raycaster,
-  Plane 
+  Plane
 } from 'three'
 // @ts-ignore
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -77,9 +76,9 @@ class X {
   };
 
   render: () => void = this.#render.bind(this);
-  onBeforeRender: (state: { elapsed: number; delta: number }) => void = () => {};
-  onAfterRender: (state: { elapsed: number; delta: number }) => void = () => {};
-  onAfterResize: (size: SizeData) => void = () => {};
+  onBeforeRender: (state: { elapsed: number; delta: number }) => void = () => { };
+  onAfterRender: (state: { elapsed: number; delta: number }) => void = () => { };
+  onAfterResize: (size: SizeData) => void = () => { };
   isDisposed: boolean = false;
 
   constructor(config: XConfig) {
@@ -266,7 +265,7 @@ class X {
             matProp.dispose();
           }
         }),
-        (obj as any).material.dispose();
+          (obj as any).material.dispose();
         (obj as any).geometry.dispose();
       }
     });
@@ -478,7 +477,8 @@ class Y extends MeshPhysicalMaterial {
 
 const XConfig = {
   count: 150,
-  colors: [0x6A0DAD, 0xFFFFFF, 0xE0E0E0],
+  // Changed colors to match the reference image (blue, white, grey)
+  colors: [0x0000ff, 0xffffff, 0x85ead7, 0x000080],
   ambientColor: 0xffffff,
   ambientIntensity: 1,
   lightIntensity: 200,
@@ -491,10 +491,10 @@ const XConfig = {
   minSize: 0.5,
   maxSize: 1,
   size0: 1,
-  gravity: 0,
+  gravity: 0.01,
   friction: 0.9975,
   wallBounce: 0.95,
-  maxVelocity: 0.15,
+  maxVelocity: 0.1,
   maxX: 5,
   maxY: 5,
   maxZ: 2,
@@ -527,10 +527,10 @@ function createPointerData(options: Partial<PointerData> & { domElement: HTMLEle
     nPosition: new Vector2(),
     hover: false,
     touching: false,
-    onEnter: () => {},
-    onMove: () => {},
-    onClick: () => {},
-    onLeave: () => {},
+    onEnter: () => { },
+    onMove: () => { },
+    onClick: () => { },
+    onLeave: () => { },
     ...options
   };
   if (!pointerMap.has(options.domElement)) {
@@ -690,8 +690,8 @@ class Z extends InstancedMesh {
     const pmrem = new PMREMGenerator(renderer);
     const envTexture = pmrem.fromScene(roomEnv).texture;
     const geometry = new SphereGeometry();
-    const material = new MeshBasicMaterial({ color: 0xff0000 }); // Temporarily use a basic red material
-    // const material = new Y({ envMap: envTexture, ...config.materialParams });
+    // Switched back to the custom physical material for 3D look
+    const material = new Y({ envMap: envTexture, ...config.materialParams });
     (material as any).envMapRotation = { x: -Math.PI / 2, y: 0, z: 0 };
     super(geometry, material, config.count);
     console.log("Z constructor: Material used:", material);
@@ -789,7 +789,8 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}): CreateBallp
   });
   let spheres: Z;
   threeInstance.renderer.toneMapping = ACESFilmicToneMapping;
-  threeInstance.scene.background = new Color(0x0000ff); // Add a blue background to the scene
+  // Changed background to black
+  threeInstance.scene.background = new Color(0x000000);
   threeInstance.camera.position.set(0, 0, 25); // Move camera slightly further
   threeInstance.camera.lookAt(0, 0, 0);
   threeInstance.cameraMaxAspect = 1.5;
