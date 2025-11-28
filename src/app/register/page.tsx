@@ -106,7 +106,7 @@ export default function Register() {
             </label>
           </div>
 
-          {/* Admin key – shown only when admin is true */}
+
           {admin && (
             <div>
               <label className="block text-sm font-medium mb-1 text-black">

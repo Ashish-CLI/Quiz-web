@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 
 const LoginBg = dynamic(() => import('@/components/login-bg1'), { 
   ssr: false,
-  loading: () => <div className="fixed inset-0 bg-black -z-10" /> // Prevents flash of white
+  loading: () => <div className="fixed inset-0 bg-black -z-10" />
 });
 
 export default function Login() {

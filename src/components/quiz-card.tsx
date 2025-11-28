@@ -89,11 +89,10 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
               className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl"
             >
               <motion.div layoutId={`image-${active.quiz_id}-${id}`}>
-                {/* You might want to add a placeholder image or remove this div if no image is available */}
                 <img
                   width={200}
                   height={200}
-                  src={CurrentCardPhoto} // Placeholder image
+                  src={CurrentCardPhoto}
                   alt={active.title}
                   className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
                 />
@@ -123,7 +122,6 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                         className="px-4 py-3 text-sm rounded-full font-bold bg-blue-500 text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Handle edit functionality
                           console.log("Edit quiz:", active.quiz_id);
                         }}
                       >
@@ -178,7 +176,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                 <img
                   width={300}
                   height={300}
-                  src={CurrentCardPhoto} // Placeholder image
+                  src={CurrentCardPhoto}
                   alt={card.title}
                   className="h-40 w-40 md:h-14 md:w-14 rounded-lg object-cover object-top"
                 />

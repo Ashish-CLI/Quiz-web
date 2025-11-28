@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-// Replace Geist fonts with Inter which is more stable
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",

@@ -36,7 +36,6 @@ export async function GET(
 
     let optionsRows: Option[] = [];
     if (questionIds.length > 0) {
-      // Dynamically create placeholders for the IN clause
       const placeholders = questionIds.map(() => '?').join(',');
       optionsRows = await query<Option[]>(
         `SELECT option_id, option_text, is_correct, question_id
@@ -47,7 +46,6 @@ export async function GET(
       );
     }
 
-    // Map options to questions
     const questions: Question[] = questionsRows.map((q: Question) => ({
       ...q,
       options: optionsRows.filter((o: Option) => o.question_id === q.question_id),
@@ -78,21 +76,18 @@ export async function DELETE(
   const { quiz_id } = params;
 
   try {
-    // Delete options associated with the quiz's questions
     await query(
       `DELETE FROM quiz.options
        WHERE question_id IN (SELECT question_id FROM quiz.questions WHERE quiz_id = ?)`,
       [quiz_id]
     );
 
-    // Delete questions associated with the quiz
     await query(
       `DELETE FROM quiz.questions
        WHERE quiz_id = ?`,
       [quiz_id]
     );
 
-    // Delete the quiz itself
     await query(
       `DELETE FROM quiz.quizzes
        WHERE quiz_id = ?`,
@@ -105,6 +100,7 @@ export async function DELETE(
     return errorResponse('An unexpected error occurred while deleting the quiz.', error, 500);
   }
 }
+
 export async function PUT(
   req: Request,
   { params }: { params: { quiz_id: string } }

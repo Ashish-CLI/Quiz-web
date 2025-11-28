@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Quiz from "../components/Quiz";
 
 export default function Home() {
   const router = useRouter();

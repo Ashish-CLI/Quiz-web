@@ -275,7 +275,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
 
   return (
     <div className="flex min-h-screen ">
-      <div className="hero_img flex fixed w-1/3 h-full absolute flex-col items-center py-10">
+      <div className="hero_img flex  w-1/3 h-full absolute flex-col items-center py-10">
         {/*left part */}
         
         <div className="quiz_title text-4xl font-bold text-white text-center mt-auto mb-10">

@@ -7,7 +7,6 @@ import { successResponse, errorResponse } from '@/lib/apiResponse';
 import { LoginRequestBody, UserQueryResult } from '@/types';
 
 export async function POST(request: Request) {
-  //const ip = request.headers.get('x-forwarded-for') || request.headers.get('remote-addr') || 'unknown';
  
 
   try {
