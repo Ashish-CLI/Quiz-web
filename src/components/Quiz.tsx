@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import { Question, Option, QuizData } from "../types";
 import { useRouter } from "next/navigation";
 
@@ -9,6 +9,9 @@ interface QuizProps {
 
 export default function Quiz({ quiz_id, user_id }: QuizProps) {
   const router = useRouter();
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: string | null }>({});
@@ -32,6 +35,32 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
     const startQuizTime = Date.now();
     setStartTime(startQuizTime);
     setLastQuestionTime(startQuizTime);
+
+   const audio = new Audio("/quiz-start.mp3");
+    audioRef.current = audio;
+    audio.volume = 0.5;
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+        })
+        .catch((error) => {
+          if (error.name === "AbortError" || error.message.includes("interrupted")) {
+             console.log("Audio playback interrupted (handled).");
+          } else {
+             console.error("Audio error:", error);
+          }
+        });
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -65,6 +94,22 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
 
   const handleAnswerClick = (questionId: string, option: Option) => {
     if (!submittedQuestions[questionId]) {
+
+      const playSound = (isCorrect: boolean) => {
+        const soundFile = isCorrect ? "/right-ans.mp3" : "/wrong-ans.mp3";
+        const audio = new Audio(soundFile);
+        audio.volume = 0.5; 
+        audio.play().catch((e) => console.error("SFX error:", e));
+      };
+
+      // Check if the clicked option is correct and play sound
+      if (option.is_correct) {
+        playSound(true);
+      } else {
+        playSound(false);
+      }
+      // ------------------------
+
       const now = Date.now();
       if (lastQuestionTime) {
         const timeTaken = Math.round((now - lastQuestionTime) / 1000);
