@@ -123,10 +123,16 @@ export async function PUT(
 
     const updateQuizQuery = `
       UPDATE quizzes
-      SET title = ?, difficulty = ?, cat_id = ?
+      SET title = ?, difficulty = ?, cat_id = ?, question_no = ?
       WHERE quiz_id = ?;
     `;
-    await connection.query(updateQuizQuery, [title, difficulty, cat_id, quiz_id]);
+    await connection.query(updateQuizQuery, [
+      title,
+      difficulty,
+      cat_id,
+      questions.length,
+      quiz_id,
+    ]);
 
     for (const question of questions) {
       if (question.question_id && typeof question.question_id === 'string' && question.question_id.startsWith("temp-")) {

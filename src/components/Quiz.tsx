@@ -239,14 +239,14 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
           <p>{quizData?.title || "Loading Quiz Title..."}</p>
         </div>
         <div className="hero_bottom text-2xl font-bold text-center w-full px-10 mb-10">
-          <p className="mb-4">
+          <p className="mb-4 text-center">
             <span className="ans_questions">{Object.keys(submittedQuestions).length}</span>/
-            <span className="total_questions">{quizData?.question_no || 0}</span> answered
+            <span className="total_questions">{questions.length || 0}</span> answered
           </p>
-          <div className="progress w-full bg-gray-700 rounded-full h-2.5">
+          <div className="progress w-full bg-gray-700 rounded-full h-2.5 mx-auto">
             <div
-              className="progress_bar bg-blue-600 h-2.5 rounded-full"
-              style={{ width: `${(Object.keys(submittedQuestions).length / (quizData?.question_no || 1)) * 100}%`, transition: 'width 0.5s ease-in-out' }}
+              className="progress_bar items-center justify-center bg-blue-600 h-2.5 rounded-full"
+              style={{ width: `${(Object.keys(submittedQuestions).length / (questions.length || 1)) * 100}%`, transition: 'width 0.5s ease-in-out' }}
             ></div>
           </div>
         </div>
