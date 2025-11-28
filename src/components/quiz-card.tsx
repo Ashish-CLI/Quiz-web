@@ -20,7 +20,11 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
   useEffect(() => { 
   const cardPhotos = [
     "/card-photos/dummy1.jpg",
-    "/card-photos/dummy2.jpg"
+    "/card-photos/dummy2.jpg",
+    "/card-photos/dummy3.jpg",
+    "/card-photos/dummy4.jpg",
+    "/card-photos/dummy5.jpg",
+    "/card-photos/dummy6.jpg"
 ];
   const randomIndex = Math.floor(Math.random() * cardPhotos.length);
         setCurrentCardPhoto(cardPhotos[randomIndex]);

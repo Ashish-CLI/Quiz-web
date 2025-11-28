@@ -478,7 +478,7 @@ class Y extends MeshPhysicalMaterial {
 const XConfig = {
   count: 150,
   // Changed colors to match the reference image (blue, white, grey)
-  colors: [0x0000ff, 0xffffff, 0x85ead7, 0x000080],
+  colors: [0x0000ff, 0xffffff, 0xff0000, 0x000080],
   ambientColor: 0xffffff,
   ambientIntensity: 1,
   lightIntensity: 200,
