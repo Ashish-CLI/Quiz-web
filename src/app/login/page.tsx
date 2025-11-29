@@ -16,7 +16,37 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Failed to send password reset email.");
+      } else {
+        setMessage(
+          "If an account with that email exists, you will receive a new password."
+        );
+      }
+    } catch (err) {
+      setError("An unexpected error occurred.");
+    }
+  };
 
   const handleSubmit = async (e:FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,15 +61,13 @@ export default function Login() {
       });
 
       const data = await response.json();
-      console.log("Login API response:", data); // Log the response for debugging
+      console.log("Login API response:", data);
 
       if (!response.ok) {
-        setError(data.message || data.error || "Login failed"); // More robust error message
+        setError(data.message || data.error || "Login failed");
         return;
       }
 
-
-      // Redirect to protected area
       router.push("/sdashboard");
     } catch (err) {
       console.error("Login request error:", err);
@@ -167,6 +195,10 @@ export default function Login() {
           <p className="mt-4 text-center text-sm text-red-600">{error}</p>
         )}
 
+        {message && (
+          <p className="mt-4 text-center text-sm text-green-600">{message}</p>
+        )}
+
         {/* Admin Login */}
         <div className="mt-6">
           <div className="relative">
@@ -181,12 +213,13 @@ export default function Login() {
 
         {/* Forgot Password */}
         <div className="text-center mt-6">
-          <Link
-            href="/forgot-password"
+          <button
+            type="button"
+            onClick={handleForgotPassword}
             className="font-medium text-blue-600 hover:text-blue-500"
           >
             Forgot Password?
-          </Link>
+          </button>
         </div>
 
         <div className="text-center mt-6">
