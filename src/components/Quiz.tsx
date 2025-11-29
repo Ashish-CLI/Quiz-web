@@ -36,7 +36,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
     setStartTime(startQuizTime);
     setLastQuestionTime(startQuizTime);
 
-   const audio = new Audio("/shuru.mp3");
+   const audio = new Audio("/quiz-start.mp3");
     audioRef.current = audio;
     audio.volume = 0.5;
 
@@ -96,7 +96,7 @@ export default function Quiz({ quiz_id, user_id }: QuizProps) {
     if (!submittedQuestions[questionId]) {
 
       const playSound = (isCorrect: boolean) => {
-        const soundFile = isCorrect ? "/kure.mp3" : "/aisa.mp3";
+        const soundFile = isCorrect ? "/right-ans.mp3" : "/wrong-ans.mp3";
         const audio = new Audio(soundFile);
         audio.volume = 0.5; 
         audio.play().catch((e) => console.error("SFX error:", e));

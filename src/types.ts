@@ -31,6 +31,7 @@ export interface QuizCardData {
   questions: { question_text: string }[];
   difficulty: string;
   cat_id: string;
+  photo: string;
 }
 
 export interface User {

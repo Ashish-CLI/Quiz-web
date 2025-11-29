@@ -15,10 +15,19 @@ export async function GET(request: Request) {
          u.user_name as creatorName,
          GROUP_CONCAT(ques.question_text ORDER BY ques.question_id SEPARATOR '||') AS question_text
        FROM quiz.quizzes q
-       JOIN quiz.users u ON q.creator_id = u.user_id
+       LEFT JOIN quiz.users u ON q.creator_id = u.user_id
        LEFT JOIN quiz.questions ques ON q.quiz_id = ques.quiz_id
        GROUP BY q.quiz_id, q.title, q.difficulty, q.cat_id, u.user_name`
      );
+
+    const cardPhotos = [
+      "/card-photos/dummy1.jpg",
+      "/card-photos/dummy2.jpg",
+      "/card-photos/dummy3.jpg",
+      "/card-photos/dummy4.jpg",
+      "/card-photos/dummy5.jpg",
+      "/card-photos/dummy6.jpg",
+    ];
 
     const quizCards: QuizCardData[] = quizCardsRows.map((row) => {
       const questions = row.question_text
@@ -31,6 +40,7 @@ export async function GET(request: Request) {
         questions: questions,
         difficulty: row.difficulty,
         cat_id: row.cat_id,
+        photo: cardPhotos[Math.floor(Math.random() * cardPhotos.length)],
       };
     });
 

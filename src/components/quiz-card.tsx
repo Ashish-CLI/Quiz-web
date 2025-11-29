@@ -12,23 +12,10 @@ interface ExpandableCardDemoProps {
 }
 
 export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableCardDemoProps) {
-  const [CurrentCardPhoto, setCurrentCardPhoto] = useState("");
   const [active, setActive] = useState<QuizCardData | boolean | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const id = useId();
   const router = useRouter();
-  useEffect(() => { 
-  const cardPhotos = [
-    "/card-photos/dummy1.jpg",
-    "/card-photos/dummy2.jpg",
-    "/card-photos/dummy3.jpg",
-    "/card-photos/dummy4.jpg",
-    "/card-photos/dummy5.jpg",
-    "/card-photos/dummy6.jpg"
-];
-  const randomIndex = Math.floor(Math.random() * cardPhotos.length);
-        setCurrentCardPhoto(cardPhotos[randomIndex]);
-  },[]);
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -92,7 +79,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                 <img
                   width={200}
                   height={200}
-                  src={CurrentCardPhoto}
+                  src={active.photo}
                   alt={active.title}
                   className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
                 />
@@ -108,10 +95,10 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                       {active.title}
                     </motion.h3>
                     <motion.p
-                      layoutId={`creator-${active.creatorName}-${id}`}
+                      layoutId={`creator-${active.quiz_id}-${id}`}
                       className="text-neutral-600 dark:text-neutral-400"
                     >
-                      By: {active.creatorName}
+                      {active.creatorName && `By: ${active.creatorName}`}
                     </motion.p>
                   </div>
 
@@ -122,7 +109,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                         className="px-4 py-3 text-sm rounded-full font-bold bg-blue-500 text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log("Edit quiz:", active.quiz_id);
+                          router.push(`/edit-quiz?quiz_id=${active.quiz_id}`);
                         }}
                       >
                         Edit
@@ -164,7 +151,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
         ) : null}
       </AnimatePresence>
       <ul className="max-w-3xl mx-auto w-full  gap-4">
-        {quizCards.map((card) => (
+        {quizCards.map((card, index) => (
           <motion.div
             layoutId={`card-${card.quiz_id}-${id}`}
             key={`card-${card.quiz_id}-${id}`}
@@ -176,7 +163,7 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                 <img
                   width={300}
                   height={300}
-                  src={CurrentCardPhoto}
+                  src={card.photo}
                   alt={card.title}
                   className="h-40 w-40 md:h-14 md:w-14 rounded-lg object-cover object-top"
                 />
@@ -189,10 +176,10 @@ export function ExpandableCardDemo({ quizCards, userRole, user_id }: ExpandableC
                   {card.title}
                 </motion.h3>
                 <motion.p
-                  layoutId={`creator-${card.creatorName}-${id}`}
+                  layoutId={`creator-${card.quiz_id}-${id}`}
                   className="text-neutral-600 dark:text-neutral-400 text-center md:text-left"
                 >
-                  By: {card.creatorName}
+                  {card.creatorName && `By: ${card.creatorName}`}
                 </motion.p>
               </div>
             </div>

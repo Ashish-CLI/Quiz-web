@@ -30,6 +30,7 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
   const [selectedCategory, setSelectedCategory] = useState("any");
   const [quizCards, setQuizCards] = useState<QuizCardData[]>([]);
   const [allQuizCards, setAllQuizCards] = useState<QuizCardData[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [isFiltersOpen, setFiltersOpen] = useState(false);
 
@@ -56,8 +57,12 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
         const response = await fetch("/api/quiz-cards");
         if (response.ok) {
           const data = await response.json();
-          setAllQuizCards(data.data);
-          setQuizCards(data.data);
+          const cardsWithPhotos = data.data.map((card: QuizCardData) => ({
+            ...card,
+            photo: card.photo,
+          }));
+          setAllQuizCards(cardsWithPhotos);
+          setQuizCards(cardsWithPhotos);
         } else {
           console.error("Failed to fetch quiz cards");
         }
@@ -70,15 +75,29 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
     fetchQuizCards();
   }, []);
 
-  const filterQuizCards = (selectedDifficulty: string, selectedCat: string) => {
+  const filterQuizCards = (
+    selectedDifficulty: string,
+    selectedCat: string,
+    search: string
+  ) => {
     let filteredCards = allQuizCards;
 
     if (selectedDifficulty !== "any") {
-      filteredCards = filteredCards.filter(card => card.difficulty === selectedDifficulty);
+      filteredCards = filteredCards.filter(
+        (card) => card.difficulty === selectedDifficulty
+      );
     }
 
     if (selectedCat !== "any") {
-      filteredCards = filteredCards.filter(card => card.cat_id.toString() === selectedCat);
+      filteredCards = filteredCards.filter(
+        (card) => card.cat_id.toString() === selectedCat
+      );
+    }
+
+    if (search) {
+      filteredCards = filteredCards.filter((card) =>
+        card.title.toLowerCase().includes(search.toLowerCase())
+      );
     }
 
     setQuizCards(filteredCards);
@@ -87,13 +106,19 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
   const handleDifficultyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newDifficulty = event.target.value;
     setDifficulty(newDifficulty);
-    filterQuizCards(newDifficulty, selectedCategory);
+    filterQuizCards(newDifficulty, selectedCategory, searchTerm);
   };
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newCategory = event.target.value;
     setSelectedCategory(newCategory);
-    filterQuizCards(difficulty, newCategory);
+    filterQuizCards(difficulty, newCategory, searchTerm);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchTerm = event.target.value;
+    setSearchTerm(newSearchTerm);
+    filterQuizCards(difficulty, selectedCategory, newSearchTerm);
   };
 
   return (
@@ -137,7 +162,24 @@ export default function Dashboard({ user_id, username, userRole }: DashboardProp
           {/* Expandable Filters Section */}
           {isFiltersOpen && (
             <div className="bg-gray-800/60 backdrop-blur-md p-6 rounded-2xl shadow-2xl mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label
+                    htmlFor="search"
+                    className="block text-lg font-medium mb-2"
+                  >
+                    Search by Title
+                  </label>
+                  <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    className="w-full bg-gray-700 border-2 border-gray-600 rounded-lg shadow-md py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Enter quiz title..."
+                  />
+                </div>
                 {/* Difficulty Filter */}
                 <div>
                   <label htmlFor="difficulty" className="block text-lg font-medium mb-2">
